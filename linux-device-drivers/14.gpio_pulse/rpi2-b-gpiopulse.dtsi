@@ -1,0 +1,12 @@
+/{
+    gpiopulse: gpio_pulse {
+        compatible = "org,pltdrv-gpiopulse";
+        org,enablepulse = <0x1>;
+        org,pulsetime = <500>;
+        
+        gpios {
+        	label = "gpiopulse";
+		    gpios = <&gpio 26 GPIO_ACTIVE_HIGH>;
+	    };
+    };
+};

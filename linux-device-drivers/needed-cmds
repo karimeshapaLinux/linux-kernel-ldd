@@ -1,0 +1,30 @@
+- Build dtb image
+	make -j12 dtbs ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+- Build overlay dts.
+	dtc -@ -I dts -O dtb -o  rpi2-b-pltdrv-atrr-dto.dtbo rpi2-b-pltdrv-atrr-dto.dts
+- Set date
+	date -s 06:05:01
+	date -s 2023-08-15
+- write clock (RTC)
+	hwclok
+- List screen command seesions
+	screen -list
+- kill a screen command session
+	screen -XS <session-id> quit
+- kill all screen sessions
+	killall screen
+- Configure kernel
+	 make menuconfig ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+- Build kernel
+	make -j12 zImage ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+- Open tty usb
+	stty -F /dev/ttyUSB0
+- Change tty usb baud rate
+	stty -F /dev/ttyUSB0 115200
+- write to tty usb
+	echo "1234" > /dev/ttyUSB0
+- qemu with new pci device
+	qemu/build/qemu-system-x86_64 -kernel kernel/linux/arch/x86_64/boot/bzImage -initrd build/build/initramfs-busybox-x86.cpio.gz -device pci-dev-emu,bus=pci.0 -nographic -append "console=ttyS0" -enable-kvm
+- qemu initrd to add usr-dev directory
+	go to $TOP/build/initramfs/busybox-x86 which all initrd directories (bin,sbin,etc,proc,sys,...)
+	find . -print0 | cpio --null -ov --format=newc | gzip -9 > $TOP/build/initramfs-busybox-x86.cpio.gz

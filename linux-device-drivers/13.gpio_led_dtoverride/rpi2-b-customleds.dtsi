@@ -1,0 +1,24 @@
+/{
+    leds {
+		led-act {
+			gpios = <&gpio 47 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-pwr {
+			label = "PWR";
+			gpios = <&gpio 35 GPIO_ACTIVE_HIGH>;
+			default-state = "keep";
+			linux,default-trigger = "default-on";
+		};
+
+		led-custom0 {
+			label = "customled0";
+			gpios = <&gpio 16 GPIO_ACTIVE_HIGH>;
+		};
+		led-custom1 {
+			label = "customled1";
+			gpios = <&gpio 20 GPIO_ACTIVE_HIGH>;
+		};
+    };
+
+};

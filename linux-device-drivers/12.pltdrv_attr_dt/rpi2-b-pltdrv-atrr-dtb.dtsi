@@ -1,0 +1,13 @@
+/{
+    pltdev0: plt_dev0 {
+        compatible = "org,pltdrv-fifo-0";
+        org,version = <0xAA>;
+        org,fsize = <8>;
+    };
+
+    pltdev1: plt_dev1 {
+        compatible = "org,pltdrv-fifo-1";
+        org,version = <0xBB>;
+        org,fsize = <8>;
+    };
+};

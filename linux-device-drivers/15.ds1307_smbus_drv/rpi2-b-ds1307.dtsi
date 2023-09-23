@@ -1,0 +1,7 @@
+&i2c1 {
+    rtcds1307: ds1307rtc@68 {
+	    compatible = "org,ds1307rtc";
+	    reg = <104>;
+    };
+
+};
