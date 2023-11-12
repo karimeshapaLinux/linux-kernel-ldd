@@ -9,7 +9,7 @@ MODULE_AUTHOR("Arabic Linux Community");
 MODULE_DESCRIPTION("kernelnewbies ldd");
 MODULE_LICENSE("GPL");
 
-#define DRIVER_NAME			"kernelnewbies"
+#define DEVICE_NAME			"kernelnewbies"
 #define DRIVER_CLASS		"kernelnewbiesclass"
 #define BASE_MINORS			(0)
 #define NR_MINORS			(1)
@@ -122,7 +122,7 @@ static int __init kernelnewbies_init(void)
 	 * @count: the number of minor numbers required
 	 * @name: the name of the associated device or driver
 	 */
-	ret = alloc_chrdev_region(&dev_nr, BASE_MINORS, NR_MINORS, DRIVER_NAME);
+	ret = alloc_chrdev_region(&dev_nr, BASE_MINORS, NR_MINORS, DEVICE_NAME);
 	if (ret < 0) {
 		pr_err("failed to allocate device numbers: %d\n", ret);
 		return ret;
@@ -137,7 +137,7 @@ static int __init kernelnewbies_init(void)
 	if (IS_ERR(new_class)) {
 		ret = PTR_ERR(new_class);
 		pr_err("failed to create class: %d\n", ret);
-		goto err_unregister_chrdev;
+		goto err_class_create;
 	}
 
 	/**
@@ -148,11 +148,11 @@ static int __init kernelnewbies_init(void)
 	 * @drvdata: the data to be added to the device for callbacks
 	 * @fmt: string for the device's name
 	 */
-	device = device_create(new_class, NULL, dev_nr, NULL, DRIVER_NAME);
+	device = device_create(new_class, NULL, dev_nr, NULL, DEVICE_NAME);
 	if (IS_ERR(device)) {
 		ret = PTR_ERR(device);
 		pr_err("Could not create device: %d\n", ret);
-		goto err_destruct_class;
+		goto err_device_create;
 	}
 
 	/**
@@ -174,25 +174,25 @@ static int __init kernelnewbies_init(void)
 	rc = cdev_add(&new_cdevice, dev_nr, 1);
 	if (rc) {
 		pr_err("Could not register char dev: %d\n", rc);
-		goto err_destruct_device;
+		goto err_add_device;
 	}
 
 	ret = kfifo_alloc(&myfifo, fsize, GFP_KERNEL);
 	if (ret) {
 		pr_err("Could not create FIFO\n");
-		goto err_unregister_cdev;
+		goto err_alloc_fifo;
 	}
 	
 	pr_info("kernelnewbies driver registered with major %d\n", MAJOR(dev_nr));
 	return 0;
 
-err_unregister_cdev:
+err_alloc_fifo:
 	cdev_del(&new_cdevice);
-err_destruct_device:
+err_add_device:
 	device_destroy(new_class, dev_nr);
-err_destruct_class:
+err_device_create:
 	class_destroy(new_class);
-err_unregister_chrdev:
+err_class_create:
 	unregister_chrdev_region(dev_nr, NR_MINORS);
 
 	return ret;
