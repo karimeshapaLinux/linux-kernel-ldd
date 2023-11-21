@@ -22,9 +22,9 @@ MODULE_LICENSE("GPL");
 static int fsize = DEFAULT_FIFO_SIZE;
 module_param(fsize, int, S_IRUGO);
 
-static struct chardrvs_dev *chardrvs_ptr;
+static struct chardrvs_priv_dev *chardrvs_ptr;
 
-static int setup_chardrvs(struct chardrvs_dev *dev)
+static int setup_chardrvs(struct chardrvs_priv_dev *dev)
 {
 	int ret;
 
@@ -43,14 +43,14 @@ static int setup_chardrvs(struct chardrvs_dev *dev)
 	return ret;
 }
 
-static void uninstall_chardrvs(struct chardrvs_dev *dev)
+static void uninstall_chardrvs(struct chardrvs_priv_dev *dev)
 {
 	kfifo_free(&dev->myfifo);
 }
 
 static int chardrvs_open(struct inode *inode, struct file *filp)
 {
-	struct chardrvs_dev *dev = GET_DEVICE();
+	struct chardrvs_priv_dev *dev = GET_DEVICE();
 
 	if (atomic_read(&dev->ref_cntr) >= dev->usrs_cnt) {
 		pr_err("Too many users open files \n");
@@ -64,7 +64,7 @@ static int chardrvs_open(struct inode *inode, struct file *filp)
 
 static int chardrvs_release(struct inode *inode, struct file *filp)
 {
-	struct chardrvs_dev *dev = (struct chardrvs_dev *)filp->private_data;
+	struct chardrvs_priv_dev *dev = (struct chardrvs_priv_dev *)filp->private_data;
 
 	if (atomic_read(&dev->ref_cntr) > 0)
 		atomic_dec(&dev->ref_cntr);
@@ -77,7 +77,7 @@ static ssize_t chardrvs_write_fifo(struct file *file, const char __user *buf,
 {
 	int ret;
 	unsigned int copiedin;
-	struct chardrvs_dev *dev = (struct chardrvs_dev *)file->private_data;
+	struct chardrvs_priv_dev *dev = (struct chardrvs_priv_dev *)file->private_data;
 
 	if (mutex_lock_interruptible(&dev->w_f_lock))
 		return -ERESTARTSYS;
@@ -109,7 +109,7 @@ static ssize_t chardrvs_read_fifo(struct file *file, char __user *buf,
 {
 	int ret;
 	unsigned int copiedout;
-	struct chardrvs_dev *dev = (struct chardrvs_dev *)file->private_data;
+	struct chardrvs_priv_dev *dev = (struct chardrvs_priv_dev *)file->private_data;
 
 	if (mutex_lock_interruptible(&dev->r_f_lock))
 		return -ERESTARTSYS;
@@ -137,7 +137,7 @@ static ssize_t chardrvs_read_fifo(struct file *file, char __user *buf,
 long chardrvs_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	int ret = 0;
-	struct chardrvs_dev *dev = (struct chardrvs_dev *)filp->private_data;
+	struct chardrvs_priv_dev *dev = (struct chardrvs_priv_dev *)filp->private_data;
 
 	if (_IOC_TYPE(cmd) != CHARDRVS_IOC_MAGIC)
 		return -ENOTTY;
@@ -171,7 +171,7 @@ long chardrvs_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 static unsigned int chardrvs_poll(struct file *filp, poll_table *wait)
 {
-	struct chardrvs_dev *dev = (struct chardrvs_dev *)filp->private_data;
+	struct chardrvs_priv_dev *dev = (struct chardrvs_priv_dev *)filp->private_data;
 	unsigned int mask = 0;
 
 	mutex_lock(&dev->lock);
@@ -185,7 +185,7 @@ static unsigned int chardrvs_poll(struct file *filp, poll_table *wait)
 #ifdef CHARDRVS_DBG
 static int chardrvs_read_procmem(struct seq_file *sf, void *unused)
 {
-	struct chardrvs_dev *dev = GET_DEVICE();
+	struct chardrvs_priv_dev *dev = GET_DEVICE();
 
 	seq_printf(sf, "Fifo max number of users %d\n", dev->usrs_cnt);
 	seq_printf(sf, "Fifo avialable entries %d\n", dev->avail);
@@ -197,7 +197,7 @@ static int chardrvs_read_procmem(struct seq_file *sf, void *unused)
 
 static int chardrvs_read_dbgmem(struct seq_file *sf, void *unused)
 {
-	struct chardrvs_dev *dev = GET_DEVICE();
+	struct chardrvs_priv_dev *dev = GET_DEVICE();
 
 	seq_printf(sf, "class at %p, cdev at %p, fifo at %p\n",
 		dev->new_class, &dev->new_cdevice, &dev->myfifo);
@@ -253,13 +253,13 @@ static int __init chardrvs_init(void)
 	int ret;
 	struct device *device = NULL;
 
-	chardrvs_ptr = kmalloc(sizeof(struct chardrvs_dev), GFP_KERNEL);
+	chardrvs_ptr = kmalloc(sizeof(struct chardrvs_priv_dev), GFP_KERNEL);
 	if (!chardrvs_ptr) {
 		ret = -ENOMEM;
 		pr_err("failed to allocate memory for device: %d\n", ret);
 		return ret;
 	}
-	memset(chardrvs_ptr, 0, sizeof(struct chardrvs_dev));
+	memset(chardrvs_ptr, 0, sizeof(struct chardrvs_priv_dev));
 
 	ret = alloc_chrdev_region(&chardrvs_ptr->dev_nr, BASE_MINORS, NR_MINORS, DRIVER_NAME);
 	if (ret < 0) {
@@ -344,7 +344,7 @@ err_free_dev:
 
 static void __exit chardrvs_clean(void)
 {
-	struct chardrvs_dev *dev = GET_DEVICE();
+	struct chardrvs_priv_dev *dev = GET_DEVICE();
 
 	cdev_del(&dev->new_cdevice);
 	device_destroy(dev->new_class, dev->dev_nr);

@@ -17,7 +17,7 @@
 #define DEFAULT_FIFO_SIZE	(16)
 #define DEFAULT_NR_USERS	(5)
 
-struct chardrvs_dev {
+struct chardrvs_priv_dev {
 	dev_t dev_nr;
 	struct class *new_class;
 	struct cdev new_cdevice;

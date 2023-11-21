@@ -9,8 +9,8 @@ MODULE_AUTHOR("Arabic Linux Community");
 MODULE_DESCRIPTION("kernelnewbies ldd");
 MODULE_LICENSE("GPL");
 
-#define DEVICE_NAME			"kernelnewbies"
-#define DRIVER_CLASS		"kernelnewbiesclass"
+#define DEVICE_NAME		"kernelnewbies"
+#define DEVICE_CLASS		"kernelnewbiesclass"
 #define BASE_MINORS			(0)
 #define NR_MINORS			(1)
 #define DEFAULT_FIFO_SIZE	(16)
@@ -133,7 +133,7 @@ static int __init kernelnewbies_init(void)
 	 * @owner: pointer to the module that is to "own" this struct class
 	 * @name: pointer to a string for the name of this class.
 	 */
-	new_class = class_create(THIS_MODULE, DRIVER_CLASS);
+	new_class = class_create(THIS_MODULE, DEVICE_CLASS);
 	if (IS_ERR(new_class)) {
 		ret = PTR_ERR(new_class);
 		pr_err("failed to create class: %d\n", ret);
