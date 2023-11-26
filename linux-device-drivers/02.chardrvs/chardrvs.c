@@ -210,6 +210,15 @@ static int chardrvs_read_dbgmem(struct seq_file *sf, void *unused)
 
 static int chardrvs_proc_open(struct inode *inode, struct file *file)
 {
+	/*
+	 * By default using -> seq_open(file, &operations);
+	 * struct seq_operations {
+	 * 	void * (*start) (struct seq_file *m, loff_t *pos);
+	 * 	void (*stop) (struct seq_file *m, void *v);
+	 * 	void * (*next) (struct seq_file *m, void *v, loff_t *pos);
+	 * 	int (*show) (struct seq_file *m, void *v);
+	 * };
+	 */	
 	return single_open(file, chardrvs_read_procmem, NULL);
 }
 
@@ -362,3 +371,4 @@ static void __exit chardrvs_clean(void)
 
 module_init(chardrvs_init);
 module_exit(chardrvs_clean);
+

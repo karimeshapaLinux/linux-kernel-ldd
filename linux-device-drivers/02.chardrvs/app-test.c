@@ -7,26 +7,33 @@
 #define STD_ON	(1)
 #define STD_OFF	(0)
 
-#define IOCTL_TEST	(STD_OFF)
-#define POLL_TEST	(STD_ON)
+#define IOCTL_TEST	(STD_ON)
+#define POLL_TEST	(STD_OFF)
 
-#define WR_VALUE 	_IOW('c', 1, int *)
-#define RD_VALUE 	_IOR('c', 2, int *)
+#define WR_VALUE 	_IOW('c', 1, int *) /* cmd 1: Set NR of users */
+#define RD_VALUE 	_IOR('c', 2, int *) /* cmd 2: Get NR of users */
 
 int main()
 {
 #if (IOCTL_TEST == STD_ON)
-	int ioctl_fd;
-	int wr_num = 10;
+	int ioctl_fd, ioret;
+	int wr_num = 2;
 	int rd_val = 0;
 	ioctl_fd = open("/dev/chardrvs", O_RDWR);
 	if (ioctl_fd < 0) {
 		printf("Can't open chardrvs driver file\n");
 		return 0;
 	}
-	ioctl(ioctl_fd, WR_VALUE, &wr_num);
-	ioctl(ioctl_fd, RD_VALUE, &rd_val);
-	printf("rd_val %d\n", rd_val);
+	ioret = ioctl(ioctl_fd, WR_VALUE, &wr_num);
+	if (ioret < 0) {
+		printf("Permissions denied...\n");
+		goto close;
+	} else {
+		ioctl(ioctl_fd, RD_VALUE, &rd_val);
+		printf("rd_val %d\n", rd_val);
+	}
+
+close:
 	close(ioctl_fd);
 #endif
 
@@ -47,3 +54,4 @@ int main()
 
 	return 0;
 }
+

@@ -4,9 +4,9 @@
 
 #define CHARDRVS_IOC_MAGIC	'c'
 #define CHARDRVS_IOC_MAX_NR	(3)
-#define CHARDRVS_IOCSETNRUSERS		_IOW(CHARDRVS_IOC_MAGIC, 1, int *)
-#define CHARDRVS_IOCGETNRUSERS		_IOR(CHARDRVS_IOC_MAGIC, 2, int *)
-#define CHARDRVS_IOCQUERYAVAILSIZE	_IOR(CHARDRVS_IOC_MAGIC, 3, int *)
+#define CHARDRVS_IOCSETNRUSERS		_IOW(CHARDRVS_IOC_MAGIC, 1, int *) /* cmd 1: Set NR of users */
+#define CHARDRVS_IOCGETNRUSERS		_IOR(CHARDRVS_IOC_MAGIC, 2, int *) /* cmd 2: Get NR of users */
+#define CHARDRVS_IOCQUERYAVAILSIZE	_IOR(CHARDRVS_IOC_MAGIC, 3, int *) /* cmd 3: Query-Get Fifo size */
 
 #define CHARDRVS_DBG
 
@@ -15,7 +15,7 @@
 #define BASE_MINORS			(0)
 #define NR_MINORS			(1)
 #define DEFAULT_FIFO_SIZE	(16)
-#define DEFAULT_NR_USERS	(5)
+#define DEFAULT_NR_USERS	(2)
 
 struct chardrvs_priv_dev {
 	dev_t dev_nr;
@@ -31,7 +31,8 @@ struct chardrvs_priv_dev {
 #endif
 	/**
 	 * General lock for concurrent access
-	 * to our device structure elements
+	 * to our private device structure
+	 * elements chardrvs_priv_dev
 	 */
 	struct mutex lock;
 
@@ -47,3 +48,4 @@ struct chardrvs_priv_dev {
 	 */
 	 wait_queue_head_t wq_f;
 };
+
