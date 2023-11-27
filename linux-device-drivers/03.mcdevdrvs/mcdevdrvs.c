@@ -5,13 +5,13 @@
 #include <linux/fs.h>
 #include <linux/cdev.h>
 
-MODULE_AUTHOR("Linux Community");
+MODULE_AUTHOR("Arabic Linux Community");
 MODULE_DESCRIPTION("mcdevdrvs ldd");
 MODULE_LICENSE("GPL");
 
-#define DEVICE_NAME			"mcdevdrvs"
+#define DEVICE_NAME		"mcdevdrvs"
 #define DEVICE_CLASS		"mcdevdrvsclass"
-#define BASE_MINORS			(0)
+#define BASE_MINORS		(0)
 #define NR_MINOR_DEVCS		(2)
 #define DEFAULT_FIFO_SIZE	(16)
 
@@ -126,7 +126,7 @@ static int __init mcdevdrvs_init(void)
 	if (IS_ERR(prv_drv.new_class)) {
 		ret = PTR_ERR(prv_drv.new_class);
 		pr_err("failed to create class: %d\n", ret);
-		goto err_unregister_chrdev;
+		goto err_class;
 	}
 	for(dev_cnt = 0; dev_cnt < NR_MINOR_DEVCS; dev_cnt++) {
 		device = device_create(prv_drv.new_class, NULL, prv_drv.dev_nr+dev_cnt,
@@ -134,20 +134,20 @@ static int __init mcdevdrvs_init(void)
 		if (IS_ERR(device)) {
 			ret = PTR_ERR(device);
 			pr_err("Could not create device: %d\n", ret);
-			goto err_destruct_class;
+			goto err_device;
 		}
 		cdev_init(&prv_drv.devcs[dev_cnt].new_cdevice, &fops);
 		rc = cdev_add(&prv_drv.devcs[dev_cnt].new_cdevice, prv_drv.dev_nr+dev_cnt, 1);
 		if (rc) {
 			pr_err("Could not register char dev: %d\n", rc);
-			goto err_destruct_device;
+			goto err_cdev;
 		}
 	}
 	for(fifo_cnt = 0; fifo_cnt < NR_MINOR_DEVCS; fifo_cnt++) {
 		ret = kfifo_alloc(&prv_drv.devcs[fifo_cnt].myfifo, fsize, GFP_KERNEL);
 		if (ret) {
 			pr_err("Could not create FIFO\n");
-			goto err_unregister_cdev;
+			goto err_fifo;
 		}
 	}
 	for(prnt_dev = 0; prnt_dev < NR_MINOR_DEVCS; prnt_dev++)
@@ -155,17 +155,17 @@ static int __init mcdevdrvs_init(void)
 					MAJOR(prv_drv.dev_nr+prnt_dev), MINOR(prv_drv.dev_nr+prnt_dev));
 	return 0;
 
-err_unregister_cdev:
+err_fifo:
 	for(; fifo_cnt >= 0; fifo_cnt--)
 		kfifo_free(&prv_drv.devcs[fifo_cnt].myfifo);
-err_destruct_device:
-err_destruct_class:
+err_cdev:
+err_device:
 	for(; dev_cnt >= 0; dev_cnt--) {
 		cdev_del(&prv_drv.devcs[dev_cnt].new_cdevice);
 		device_destroy(prv_drv.new_class, prv_drv.dev_nr+dev_cnt);
 	}
 	class_destroy(prv_drv.new_class);
-err_unregister_chrdev:
+err_class:
 	unregister_chrdev_region(prv_drv.dev_nr, NR_MINOR_DEVCS);
 
 	return ret;
