@@ -1,0 +1,33 @@
+{
+    "files.associations": {
+        "fs.h": "c",
+        "kfifo.h": "c",
+        "init.h": "c",
+        "module.h": "c",
+        "mutex.h": "c",
+        "of_platform.h": "c",
+        "cdev.h": "c",
+        "limits": "c",
+        "*.tcc": "c",
+        "type_traits": "c",
+        "typeinfo": "c",
+        "string.h": "c",
+        "virtbus.h": "c",
+        "pltdata.h": "c",
+        "bcd.h": "c",
+        "i2c.h": "c",
+        "device.h": "c",
+        "errno.h": "c",
+        "serial.h": "c",
+        "driver.h": "c",
+        "cp2102_intrn.h": "c",
+        "tty_flags.h": "c",
+        "cp2102int.h": "c",
+        "blkdev.h": "c",
+        "types.h": "c",
+        "ioctl.h": "c",
+        "list.h": "c",
+        "kdev_t.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}

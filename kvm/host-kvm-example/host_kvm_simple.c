@@ -6,6 +6,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <asm-generic/mman.h>
 
 #define E_OK      (0)
 #define E_NOT_OK  (1)
