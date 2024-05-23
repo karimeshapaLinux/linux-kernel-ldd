@@ -1,3 +1,8 @@
+/*
+ * This code based on the following article
+ * https://zserge.com/posts/kvm/
+ */
+
 #include <fcntl.h>
 #include <linux/kvm.h>
 #include <stdint.h>
